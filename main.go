@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/mauricioabreu/keep/cmd"
 
+func main() {
+	cmd.Execute()
 }
