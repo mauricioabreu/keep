@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mauricioabreu/keep/internal/config"
 	"go.uber.org/fx"
 )
 
@@ -17,12 +18,12 @@ func New() *echo.Echo {
 	return e
 }
 
-func registerHooks(lc fx.Lifecycle, e *echo.Echo) {
+func registerHooks(lc fx.Lifecycle, cfg *config.Config, e *echo.Echo) {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(context.Context) error {
 				go func() {
-					if err := e.Start(":8080"); err != nil {
+					if err := e.Start(":" + cfg.ServerPort); err != nil {
 						e.Logger.Info("shutting down the server")
 					}
 				}()
