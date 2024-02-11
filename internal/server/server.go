@@ -6,11 +6,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/mauricioabreu/keep/internal/config"
+	"github.com/mauricioabreu/keep/internal/db"
 	"go.uber.org/fx"
 )
 
-func New() *echo.Echo {
+func New(q *db.Queries) *echo.Echo {
 	e := echo.New()
+	e.POST("/notes", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Note created")
+	})
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})

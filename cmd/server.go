@@ -5,6 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/mauricioabreu/keep/internal/config"
+	"github.com/mauricioabreu/keep/internal/db"
 	"github.com/mauricioabreu/keep/internal/server"
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
@@ -24,6 +25,8 @@ var serverCmd = &cobra.Command{
 
 		app := fx.New(
 			fx.Provide(config.New),
+			fx.Provide(db.NewPool),
+			fx.Provide(db.NewQuerier),
 			server.Module)
 		app.Run()
 	},
