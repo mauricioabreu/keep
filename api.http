@@ -1,0 +1,11 @@
+### API Base URL
+@baseURL = http://localhost:8080
+
+### Create a New Note
+POST {{baseURL}}/notes
+Content-Type: application/json
+
+{
+  "title": "Sample Note Title",
+  "content": "This is the content of the note."
+}
