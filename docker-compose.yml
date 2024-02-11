@@ -1,0 +1,13 @@
+services:
+  db:
+    container_name: db
+    image: postgres:16.1
+    restart: always
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: keep
+      POSTGRES_PASSWORD: keep
+      POSTGRES_DB: kep

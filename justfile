@@ -1,0 +1,2 @@
+deps:
+    docker compose up

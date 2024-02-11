@@ -10,9 +10,28 @@ import (
 	"go.uber.org/fx"
 )
 
+type Note struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 func New(q *db.Queries) *echo.Echo {
 	e := echo.New()
 	e.POST("/notes", func(c echo.Context) error {
+		note := new(Note)
+		if err := c.Bind(note); err != nil {
+			return err
+		}
+
+		_, err := q.CreateNote(context.Background(), db.CreateNoteParams{
+			Title:   note.Title,
+			Content: note.Content,
+		})
+
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to create note")
+		}
+
 		return c.String(http.StatusOK, "Note created")
 	})
 	e.GET("/", func(c echo.Context) error {
