@@ -41,7 +41,10 @@ func (suite *NoteHandlerSuite) TestCreateNoteSuccess() {
 	rec := httptest.NewRecorder()
 	c := suite.Echo.NewContext(req, rec)
 
-	suite.noteStorer.EXPECT().CreateNote(gomock.Any(), gomock.Any()).Return(db.Note{
+	suite.noteStorer.EXPECT().CreateNote(gomock.Any(), db.CreateNoteParams{
+		Title:   "Test Title",
+		Content: "Test Content",
+	}).Return(db.Note{
 		ID:      1,
 		Title:   "Test Title",
 		Content: "Test Content",
