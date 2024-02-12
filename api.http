@@ -6,6 +6,6 @@ POST {{baseURL}}/notes
 Content-Type: application/json
 
 {
-  "title": "Sample Note Title",
-  "content": "This is the content of the note."
+  "title": "TIL: how does the internet work?",
+  "content": "The internet is a pile of cables and computers that sometimes work."
 }

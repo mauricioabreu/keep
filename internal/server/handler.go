@@ -3,11 +3,18 @@ package server
 import (
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/mauricioabreu/keep/internal/db"
 )
 
 type Note struct {
+	Title   string `json:"title" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}
+
+type NoteResponse struct {
+	ID      int32  `json:"id"`
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
@@ -26,14 +33,43 @@ func (h *NoteHandler) CreateNote(c echo.Context) error {
 		return err
 	}
 
-	_, err := h.dbq.CreateNote(c.Request().Context(), db.CreateNoteParams{
+	validate := validator.New()
+	err := validate.Struct(note)
+
+	if err != nil {
+		validationErrors := []ErrorDetail{}
+		for _, err := range err.(validator.ValidationErrors) {
+			validationErrors = append(validationErrors, ErrorDetail{
+				Reason:  err.StructField(),
+				Message: "Field validation for '" + err.StructField() + "' failed on the '" + err.Tag() + "' tag",
+			})
+		}
+
+		return c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: Error{
+				Code:    "INVALID_REQUEST",
+				Message: "Invalid request",
+				Details: validationErrors,
+			},
+		})
+	}
+
+	createdNote, err := h.dbq.CreateNote(c.Request().Context(), db.CreateNoteParams{
 		Title:   note.Title,
 		Content: note.Content,
 	})
 
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "Failed to create note")
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: Error{
+				Code:    "INTERNAL_ERROR",
+				Message: "Internal error",
+			},
+		})
 	}
 
-	return c.String(http.StatusOK, "Note created")
+	return c.JSON(http.StatusCreated, SuccessResponse{
+		Message: "Note created",
+		Data:    NoteResponse{ID: createdNote.ID, Title: createdNote.Title, Content: createdNote.Content},
+	})
 }
