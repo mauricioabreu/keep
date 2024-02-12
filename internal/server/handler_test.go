@@ -31,7 +31,8 @@ func (suite *NoteHandlerSuite) SetupTest() {
 
 func (suite *NoteHandlerSuite) TestCreateNoteSuccess() {
 	reqBody := `
-		{"title": "Test Title",
+	{
+		"title": "Test Title",
 		"content": "Test Content"
 	}`
 
@@ -49,6 +50,17 @@ func (suite *NoteHandlerSuite) TestCreateNoteSuccess() {
 	err := suite.noteHandler.CreateNote(c)
 	suite.NoError(err)
 	suite.Equal(http.StatusCreated, rec.Code)
+
+	expectedBody := `
+	{
+		"message": "Note created",
+		"data": {
+			"id":1,
+			"title":"Test Title",
+			"content":"Test Content"
+		}
+	}`
+	suite.JSONEq(expectedBody, rec.Body.String())
 }
 
 func TestNoteHandler(t *testing.T) {
