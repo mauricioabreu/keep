@@ -8,10 +8,11 @@ import (
 	"github.com/mauricioabreu/keep/internal/config"
 	"github.com/mauricioabreu/keep/internal/db"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
-func New(dbq *db.Queries) *echo.Echo {
-	noteHandler := NewNoteHandler(dbq)
+func New(dbq *db.Queries, logger *zap.SugaredLogger) *echo.Echo {
+	noteHandler := NewNoteHandler(dbq, logger)
 
 	e := echo.New()
 	e.POST("/notes", noteHandler.CreateNote)

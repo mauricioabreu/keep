@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/mauricioabreu/keep/internal/db"
+	"go.uber.org/zap"
 )
 
 type Note struct {
@@ -14,17 +16,18 @@ type Note struct {
 }
 
 type NoteResponse struct {
-	ID      int32  `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	ID      uuid.UUID `json:"id"`
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
 }
 
 type NoteHandler struct {
-	sdb db.NoteStorer
+	sdb    db.NoteStorer
+	logger *zap.SugaredLogger
 }
 
-func NewNoteHandler(s db.NoteStorer) *NoteHandler {
-	return &NoteHandler{sdb: s}
+func NewNoteHandler(s db.NoteStorer, logger *zap.SugaredLogger) *NoteHandler {
+	return &NoteHandler{sdb: s, logger: logger}
 }
 
 func (h *NoteHandler) CreateNote(c echo.Context) error {
@@ -60,6 +63,7 @@ func (h *NoteHandler) CreateNote(c echo.Context) error {
 	})
 
 	if err != nil {
+		h.logger.Errorw("Error creating note", "error", err)
 		return c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Error: Error{
 				Code:    "INTERNAL_ERROR",

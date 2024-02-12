@@ -6,10 +6,11 @@ package db
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 type Note struct {
-	ID        int32
+	ID        uuid.UUID
 	Title     string
 	Content   string
 	CreatedAt pgtype.Timestamp

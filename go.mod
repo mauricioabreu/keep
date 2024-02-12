@@ -5,6 +5,7 @@ go 1.21.5
 require (
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/go-playground/validator/v10 v10.18.0
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.4
@@ -12,6 +13,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/fx v1.20.1
 	go.uber.org/mock v0.4.0
+	go.uber.org/zap v1.23.0
 )
 
 require (
@@ -37,7 +39,6 @@ require (
 	go.uber.org/dig v1.17.0 // indirect
 	go.uber.org/goleak v1.2.1 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
