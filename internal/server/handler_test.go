@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,13 +30,16 @@ func (suite *NoteHandlerSuite) SetupTest() {
 	suite.Echo = echo.New()
 }
 
+func (suite *NoteHandlerSuite) TearDownTest() {
+	suite.ctrl.Finish()
+}
+
 func (suite *NoteHandlerSuite) TestCreateNoteSuccess() {
 	reqBody := `
 	{
 		"title": "Test Title",
 		"content": "Test Content"
 	}`
-
 	req := httptest.NewRequest(http.MethodPost, "/notes", bytes.NewBufferString(reqBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -64,6 +68,25 @@ func (suite *NoteHandlerSuite) TestCreateNoteSuccess() {
 		}
 	}`
 	suite.JSONEq(expectedBody, rec.Body.String())
+}
+
+func (suite *NoteHandlerSuite) TestCreateNoteFailureStore() {
+	reqBody := `
+	{
+		"title": "Test Title",
+		"content": "Test Content"
+	}`
+	req := httptest.NewRequest(http.MethodPost, "/notes", bytes.NewBufferString(reqBody))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := suite.Echo.NewContext(req, rec)
+
+	suite.noteStorer.EXPECT().CreateNote(gomock.Any(), gomock.Any()).
+		Return(db.Note{}, errors.New("failed to create note"))
+
+	err := suite.noteHandler.CreateNote(c)
+	suite.NoError(err)
+	suite.Equal(http.StatusInternalServerError, rec.Code)
 }
 
 func TestNoteHandler(t *testing.T) {
