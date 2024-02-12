@@ -20,11 +20,11 @@ type NoteResponse struct {
 }
 
 type NoteHandler struct {
-	dbq *db.Queries
+	sdb db.NoteStorer
 }
 
-func NewNoteHandler(dbq *db.Queries) *NoteHandler {
-	return &NoteHandler{dbq: dbq}
+func NewNoteHandler(s db.NoteStorer) *NoteHandler {
+	return &NoteHandler{sdb: s}
 }
 
 func (h *NoteHandler) CreateNote(c echo.Context) error {
@@ -54,7 +54,7 @@ func (h *NoteHandler) CreateNote(c echo.Context) error {
 		})
 	}
 
-	createdNote, err := h.dbq.CreateNote(c.Request().Context(), db.CreateNoteParams{
+	createdNote, err := h.sdb.CreateNote(c.Request().Context(), db.CreateNoteParams{
 		Title:   note.Title,
 		Content: note.Content,
 	})
