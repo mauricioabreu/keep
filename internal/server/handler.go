@@ -70,6 +70,10 @@ func (h *NoteHandler) CreateNote(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, SuccessResponse{
 		Message: "Note created",
-		Data:    NoteResponse{ID: createdNote.ID, Title: createdNote.Title, Content: createdNote.Content},
+		Data: NoteResponse{
+			ID:      createdNote.ID,
+			Title:   createdNote.Title,
+			Content: createdNote.Content,
+		},
 	})
 }
