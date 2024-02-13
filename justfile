@@ -3,3 +3,6 @@ test:
 
 deps:
     docker compose up
+
+term:
+    go run term/main.go
