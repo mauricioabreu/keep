@@ -1,4 +1,7 @@
 version: "2"
+overrides:
+  - go_type: "github.com/google/uuid"
+    db_type: "uuid"
 sql:
   - engine: "postgresql"
     queries: "query.sql"

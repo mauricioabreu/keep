@@ -12,6 +12,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	uuid "github.com/google/uuid"
 	db "github.com/mauricioabreu/keep/internal/db"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -52,4 +53,19 @@ func (m *MockNoteStorer) CreateNote(arg0 context.Context, arg1 db.CreateNotePara
 func (mr *MockNoteStorerMockRecorder) CreateNote(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNote", reflect.TypeOf((*MockNoteStorer)(nil).CreateNote), arg0, arg1)
+}
+
+// GetNote mocks base method.
+func (m *MockNoteStorer) GetNote(arg0 context.Context, arg1 uuid.UUID) (db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNote", arg0, arg1)
+	ret0, _ := ret[0].(db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNote indicates an expected call of GetNote.
+func (mr *MockNoteStorerMockRecorder) GetNote(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNote", reflect.TypeOf((*MockNoteStorer)(nil).GetNote), arg0, arg1)
 }

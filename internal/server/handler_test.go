@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/mauricioabreu/keep/internal/db"
 	"github.com/mauricioabreu/keep/internal/mocks"
@@ -89,6 +90,58 @@ func (suite *NoteHandlerSuite) TestCreateNoteFailureStore() {
 	err := suite.noteHandler.CreateNote(c)
 	suite.NoError(err)
 	suite.Equal(http.StatusInternalServerError, rec.Code)
+}
+
+func (suite *NoteHandlerSuite) TestGetNoteSuccess() {
+	req := httptest.NewRequest(http.MethodGet, "/notes/123e4567-e89b-12d3-a456-426614174000", nil)
+	rec := httptest.NewRecorder()
+	c := suite.Echo.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues("123e4567-e89b-12d3-a456-426614174000")
+
+	suite.noteStorer.EXPECT().GetNote(gomock.Any(), uuid.MustParse("123e4567-e89b-12d3-a456-426614174000")).Return(db.Note{
+		ID:      uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+		Title:   "Test Note",
+		Content: "Test Content",
+	}, nil)
+
+	err := suite.noteHandler.GetNote(c)
+	suite.NoError(err)
+	suite.Equal(http.StatusOK, rec.Code)
+
+	expectedBody := `
+    {
+        "message": "Note found",
+        "data": {
+            "id":"123e4567-e89b-12d3-a456-426614174000",
+            "title":"Test Note",
+            "content":"Test Content"
+        }
+    }`
+	suite.JSONEq(expectedBody, rec.Body.String())
+}
+
+func (suite *NoteHandlerSuite) TestGetNoteNotFound() {
+	req := httptest.NewRequest(http.MethodGet, "/notes/123e4567-e89b-12d3-a456-426614174000", nil)
+	rec := httptest.NewRecorder()
+	c := suite.Echo.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues("123e4567-e89b-12d3-a456-426614174000")
+
+	suite.noteStorer.EXPECT().GetNote(gomock.Any(), uuid.MustParse("123e4567-e89b-12d3-a456-426614174000")).Return(db.Note{}, pgx.ErrNoRows)
+
+	err := suite.noteHandler.GetNote(c)
+	suite.NoError(err)
+	suite.Equal(http.StatusNotFound, rec.Code)
+
+	expectedBody := `
+    {
+        "error": {
+            "code": "NOT_FOUND",
+            "message": "Note not found"
+        }
+    }`
+	suite.JSONEq(expectedBody, rec.Body.String())
 }
 
 func TestNoteHandler(t *testing.T) {

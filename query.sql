@@ -5,3 +5,6 @@ INSERT INTO notes (
     $1, $2
 )
 RETURNING *;
+
+-- name: GetNote :one
+SELECT * FROM notes WHERE id = $1;

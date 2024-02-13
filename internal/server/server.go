@@ -16,6 +16,7 @@ func New(dbq *db.Queries, logger *zap.SugaredLogger) *echo.Echo {
 
 	e := echo.New()
 	e.POST("/notes", noteHandler.CreateNote)
+	e.GET("/notes/:id", noteHandler.GetNote)
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})

@@ -5,8 +5,8 @@
 package db
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Note struct {

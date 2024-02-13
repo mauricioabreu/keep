@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/mauricioabreu/keep/internal/db"
 	"go.uber.org/zap"
@@ -28,6 +29,53 @@ type NoteHandler struct {
 
 func NewNoteHandler(s db.NoteStorer, logger *zap.SugaredLogger) *NoteHandler {
 	return &NoteHandler{sdb: s, logger: logger}
+}
+
+func (h *NoteHandler) GetNote(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponse{
+			Error: Error{
+				Code:    "INVALID_REQUEST",
+				Message: "Invalid request",
+				Details: []ErrorDetail{
+					{
+						Reason:  "id",
+						Message: "Invalid UUID",
+					},
+				},
+			},
+		})
+	}
+
+	note, err := h.sdb.GetNote(c.Request().Context(), id)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return c.JSON(http.StatusNotFound, ErrorResponse{
+				Error: Error{
+					Code:    "NOT_FOUND",
+					Message: "Note not found",
+				},
+			})
+		}
+
+		h.logger.Errorw("Error getting note", "error", err)
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: Error{
+				Code:    "INTERNAL_ERROR",
+				Message: "Internal error",
+			},
+		})
+	}
+
+	return c.JSON(http.StatusOK, SuccessResponse{
+		Message: "Note found",
+		Data: NoteResponse{
+			ID:      note.ID,
+			Title:   note.Title,
+			Content: note.Content,
+		},
+	})
 }
 
 func (h *NoteHandler) CreateNote(c echo.Context) error {

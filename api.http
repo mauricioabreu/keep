@@ -1,7 +1,7 @@
 ### API Base URL
 @baseURL = http://localhost:8080
 
-### Create a New Note
+### Create a new Note
 POST {{baseURL}}/notes
 Content-Type: application/json
 
@@ -9,3 +9,8 @@ Content-Type: application/json
   "title": "TIL: how does the internet work?",
   "content": "The internet is a pile of cables and computers that sometimes work"
 }
+
+### Get a Note
+# @prompt id UUID
+GET {{baseURL}}/notes/{{id}}
+Accept: application/json

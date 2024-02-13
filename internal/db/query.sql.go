@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createNote = `-- name: CreateNote :one
@@ -25,6 +27,22 @@ type CreateNoteParams struct {
 
 func (q *Queries) CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error) {
 	row := q.db.QueryRow(ctx, createNote, arg.Title, arg.Content)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getNote = `-- name: GetNote :one
+SELECT id, title, content, created_at FROM notes WHERE id = $1
+`
+
+func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (Note, error) {
+	row := q.db.QueryRow(ctx, getNote, id)
 	var i Note
 	err := row.Scan(
 		&i.ID,
