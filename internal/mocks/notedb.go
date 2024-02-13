@@ -69,3 +69,18 @@ func (mr *MockNoteStorerMockRecorder) GetNote(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNote", reflect.TypeOf((*MockNoteStorer)(nil).GetNote), arg0, arg1)
 }
+
+// ListNotes mocks base method.
+func (m *MockNoteStorer) ListNotes(arg0 context.Context) ([]db.Note, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListNotes", arg0)
+	ret0, _ := ret[0].([]db.Note)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListNotes indicates an expected call of ListNotes.
+func (mr *MockNoteStorerMockRecorder) ListNotes(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNotes", reflect.TypeOf((*MockNoteStorer)(nil).ListNotes), arg0)
+}

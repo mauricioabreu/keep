@@ -78,6 +78,33 @@ func (h *NoteHandler) GetNote(c echo.Context) error {
 	})
 }
 
+func (h *NoteHandler) ListNotes(c echo.Context) error {
+	notes, err := h.sdb.ListNotes(c.Request().Context())
+	if err != nil {
+		h.logger.Errorw("Error listing notes", "error", err)
+		return c.JSON(http.StatusInternalServerError, ErrorResponse{
+			Error: Error{
+				Code:    "INTERNAL_ERROR",
+				Message: "Internal error",
+			},
+		})
+	}
+
+	notesResponse := []NoteResponse{}
+	for _, note := range notes {
+		notesResponse = append(notesResponse, NoteResponse{
+			ID:      note.ID,
+			Title:   note.Title,
+			Content: note.Content,
+		})
+	}
+
+	return c.JSON(http.StatusOK, SuccessResponse{
+		Message: "Notes found",
+		Data:    notesResponse,
+	})
+}
+
 func (h *NoteHandler) CreateNote(c echo.Context) error {
 	note := new(Note)
 	if err := c.Bind(note); err != nil {

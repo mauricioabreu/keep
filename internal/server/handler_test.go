@@ -144,6 +144,49 @@ func (suite *NoteHandlerSuite) TestGetNoteNotFound() {
 	suite.JSONEq(expectedBody, rec.Body.String())
 }
 
+func (suite *NoteHandlerSuite) TestListNotesSucces() {
+	req := httptest.NewRequest(http.MethodGet, "/notes", nil)
+	rec := httptest.NewRecorder()
+	c := suite.Echo.NewContext(req, rec)
+
+	suite.noteStorer.EXPECT().ListNotes(gomock.Any()).Return([]db.Note{
+		{
+			ID:      uuid.MustParse("123e4567-e89b-12d3-a456-426614174000"),
+			Title:   "Test Note",
+			Content: "Test Content",
+		},
+	}, nil)
+
+	err := suite.noteHandler.ListNotes(c)
+	suite.NoError(err)
+	suite.Equal(http.StatusOK, rec.Code)
+
+	expectedBody := `
+	{
+		"message": "Notes found",
+		"data": [
+			{
+				"id":"123e4567-e89b-12d3-a456-426614174000",
+				"title":"Test Note",
+				"content":"Test Content"
+			}
+		]
+	}`
+	suite.JSONEq(expectedBody, rec.Body.String())
+}
+
+func (suite *NoteHandlerSuite) TestListNotesFailure() {
+	req := httptest.NewRequest(http.MethodGet, "/notes", nil)
+	rec := httptest.NewRecorder()
+	c := suite.Echo.NewContext(req, rec)
+
+	suite.noteStorer.EXPECT().ListNotes(gomock.Any()).Return(nil, errors.New("failed to list notes"))
+
+	err := suite.noteHandler.ListNotes(c)
+	suite.NoError(err)
+	suite.Equal(http.StatusInternalServerError, rec.Code)
+}
+
 func TestNoteHandler(t *testing.T) {
 	suite.Run(t, new(NoteHandlerSuite))
 }

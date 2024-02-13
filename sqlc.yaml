@@ -1,7 +1,4 @@
 version: "2"
-overrides:
-  - go_type: "github.com/google/uuid"
-    db_type: "uuid"
 sql:
   - engine: "postgresql"
     queries: "query.sql"
@@ -11,3 +8,8 @@ sql:
         package: "db"
         out: "internal/db"
         sql_package: "pgx/v5"
+        overrides:
+        - db_type: "uuid"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"

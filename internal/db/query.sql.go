@@ -52,3 +52,32 @@ func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (Note, error) {
 	)
 	return i, err
 }
+
+const listNotes = `-- name: ListNotes :many
+SELECT id, title, content, created_at FROM notes
+`
+
+func (q *Queries) ListNotes(ctx context.Context) ([]Note, error) {
+	rows, err := q.db.Query(ctx, listNotes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Note
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
